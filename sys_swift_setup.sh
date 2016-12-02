@@ -39,8 +39,8 @@ if [[ $EUID -ne 0 ]]; then
    exit 1
 fi
 
-SWIFT_USER="swift"
-SWIFT_GROUP="swift"
+SWIFT_USER="ubuntu"
+SWIFT_GROUP="ubuntu"
 
 SWIFT_PARTITION_START_BLOCK="2048"
 SWIFT_PARTITION_END_BLOCK="3907029167"
