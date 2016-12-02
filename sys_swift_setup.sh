@@ -93,7 +93,7 @@ for x in {1..4}; do
    SWIFT_DISK_DIR="${SWIFT_DISK_BASE_DIR}/${x}"
    SWIFT_MOUNT_DIR="${SWIFT_MOUNT_BASE_DIR}/${x}"
    SWIFT_CACHE_DIR="${SWIFT_CACHE_BASE_DIR}/swift${x}"
-   mkdir ${SWIFT_MOUNT_DIR}
+   mkdir -p ${SWIFT_MOUNT_DIR}
    chown ${SWIFT_USER}:${SWIFT_GROUP} ${SWIFT_MOUNT_DIR}
 
    # necessary? used anywhere?
