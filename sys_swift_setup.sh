@@ -177,10 +177,6 @@ chown -R ${SWIFT_USER}:${SWIFT_GROUP} ${SWIFT_USER_BIN}; cd -
 sed -i "/find \/var\/log\/swift/d" ${SWIFT_USER_BIN}/resetswift
 sed -i 's/\/dev\/sdb1/\/srv\/swift-disk/g' ${SWIFT_USER_BIN}/resetswift
 
-#chnaging swift ports to 5*** series
-find ${SWIFT_CONFIG_DIR} -type f -exec sed -i 's/^bind_port = \(6\)\([0-9]*\)/echo "bind_port = 5\2"/ge' {} \;
-sed -i 's/^\(swift-ring-builder .*\)\([0-9]:\)\(6\)\([0-9][0-9][0-9]\)\(.*\)/echo "\1\25\4\5"/ge' ${SWIFT_USER_BIN}/remakerings
-
 #install SAIO in development mode
 #Use python setup.py install in order to install the application
 cd ${SWIFT_CLI_REPO_DIR}
