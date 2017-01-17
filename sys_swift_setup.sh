@@ -84,13 +84,13 @@ done
 
 
 for device in vdc vdd vde vdf; do
-   num=1
-   mkfs.xfs -f -L disk${num} /dev/${device}1
-   mkdir -p ${SWIFT_MOUNT_BASE_DIR}/${device}1/${num}
-   ln -s ${SWIFT_MOUNT_BASE_DIR}/${device}1/${num} ${SWIFT_DISK_BASE_DIR}/${num}
-   mkdir -p ${SWIFT_CACHE_BASE_DIR}/swift${num}
-   chown -R ${SWIFT_USER}:${SWIFT_GROUP} ${SWIFT_MOUNT_BASE_DIR}/${device}1
-   num=$(expr ${num} + 1)
+   for num in {1..4}; do
+      mkfs.xfs -f -L disk${num} /dev/${device}1
+      mkdir -p ${SWIFT_MOUNT_BASE_DIR}/${device}1/${num}
+      ln -s ${SWIFT_MOUNT_BASE_DIR}/${device}1/${num} ${SWIFT_DISK_BASE_DIR}/${num}
+      mkdir -p ${SWIFT_CACHE_BASE_DIR}/swift${num}
+      chown -R ${SWIFT_USER}:${SWIFT_GROUP} ${SWIFT_MOUNT_BASE_DIR}/${device}1
+   done
 done
 mv ${SWIFT_CACHE_BASE_DIR}/swift1 ${SWIFT_CACHE_BASE_DIR}/swift
 
