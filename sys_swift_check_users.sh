@@ -29,11 +29,11 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 if [ "" = "${SWIFT_USER}" ]; then
-   export SWIFT_USER="swift"
+   export SWIFT_USER="ubuntu"
 fi
 
 if [ "" = "${SWIFT_GROUP}" ]; then
-   export SWIFT_GROUP="swift"
+   export SWIFT_GROUP="ubuntu"
 fi
 
 #verify that swift group exists
@@ -46,10 +46,10 @@ fi
 
 #verify swift user exists
 if grep -q ${SWIFT_USER} /etc/passwd; then
-   echo "swift user exists"
+   echo "swift user 'ubuntu' exists"
 else
   useradd -g ${SWIFT_GROUP} -m -s /bin/bash ${SWIFT_USER}
-  echo "swift user has been created"
+  echo "swift user 'ubuntu' has been created"
    
   #add user to sudo group
   adduser ${SWIFT_USER} sudo
