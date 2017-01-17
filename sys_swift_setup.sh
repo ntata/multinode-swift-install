@@ -67,18 +67,8 @@ chown -R ${SWIFT_USER}:${SWIFT_GROUP} ${SWIFT_PROFILE_LOG_DIR}
 chown -R syslog.adm ${SWIFT_LOG_DIR}
 chmod -R g+w ${SWIFT_LOG_DIR}
 
-# Create /srv directory structure
-for x in {1..4}; do
-   SWIFT_DISK_DIR="${SWIFT_DISK_BASE_DIR}/${x}"
-   SWIFT_CACHE_DIR="${SWIFT_CACHE_BASE_DIR}/swift${x}"
-
-   # necessary? used anywhere?
-   mkdir -p "${SWIFT_CACHE_DIR}"
-done
-
 #Create partitions on devices attached
 for device in vdc vdd vde vdf; do
-num=1
 sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | fdisk /dev/${device}
   o # clear the in memory partition table
   n # new partition
@@ -90,12 +80,17 @@ sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | fdisk /dev/${device}
   w # save and close
   q
 EOF
-mkfs.xfs -L disk${num} -f /dev/${device}1
-mkdir -p ${SWIFT_MOUNT_BASE_DIR}/${device}1/${num}
-ln -s ${SWIFT_MOUNT_BASE_DIR}/${device}1/${num} ${SWIFT_DISK_BASE_DIR}/${num}
-mkdir -p ${SWIFT_CACHE_BASE_DIR}/swift${num}
-chown -R ${SWIFT_USER}:${SWIFT_GROUP} ${SWIFT_MOUNT_BASE_DIR}/${device}1
-num=$(expr ${num} + 1)
+done
+
+
+for device in vdc vdd vde vdf; do
+   num=1
+   mkfs.xfs -f -L disk${num} /dev/${device}1
+   mkdir -p ${SWIFT_MOUNT_BASE_DIR}/${device}1/${num}
+   ln -s ${SWIFT_MOUNT_BASE_DIR}/${device}1/${num} ${SWIFT_DISK_BASE_DIR}/${num}
+   mkdir -p ${SWIFT_CACHE_BASE_DIR}/swift${num}
+   chown -R ${SWIFT_USER}:${SWIFT_GROUP} ${SWIFT_MOUNT_BASE_DIR}/${device}1
+   num=$(expr ${num} + 1)
 done
 mv ${SWIFT_CACHE_BASE_DIR}/swift1 ${SWIFT_CACHE_BASE_DIR}/swift
 
