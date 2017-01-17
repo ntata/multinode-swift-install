@@ -23,11 +23,11 @@
 ############################################
 
 if [ "" = "${SWIFT_USER}" ]; then
-   export SWIFT_USER="ubuntu"
+   export SWIFT_USER="swift"
 fi
 
 if [ "" = "${SWIFT_GROUP}" ]; then
-   export SWIFT_GROUP="ubuntu"
+   export SWIFT_GROUP="swift"
 fi
 
 if [ ! -d "/var/run/swift" ]; then

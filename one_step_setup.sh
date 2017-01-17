@@ -28,8 +28,8 @@ if [[ $EUID -ne 0 ]]; then
    exit 1
 fi
 
-export SWIFT_USER="ubuntu"
-export SWIFT_GROUP="ubuntu"
+export SWIFT_USER="swift"
+export SWIFT_GROUP="swift"
 export SWIFT_USER_HOME="/home/${SWIFT_USER}"
 
 ./sys_swift_check_users.sh

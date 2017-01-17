@@ -39,11 +39,11 @@ if [[ $EUID -ne 0 ]]; then
    exit 1
 fi
 
-SWIFT_USER="ubuntu"
-SWIFT_GROUP="ubuntu"
+SWIFT_USER="swift"
+SWIFT_GROUP="swift"
 
 SWIFT_PARTITION_START_BLOCK="2048"
-SWIFT_PARTITION_END_BLOCK="3907029167"
+SWIFT_PARTITION_END_BLOCK="20971519"
 
 
 SWIFT_DISK_BASE_DIR="/srv"
@@ -67,41 +67,49 @@ chown -R ${SWIFT_USER}:${SWIFT_GROUP} ${SWIFT_PROFILE_LOG_DIR}
 chown -R syslog.adm ${SWIFT_LOG_DIR}
 chmod -R g+w ${SWIFT_LOG_DIR}
 
-SWIFT_DISK="${SWIFT_DISK_BASE_DIR}/swift-disk"
-for x in {1..8}; do
-   SWIFT_DISK="${SWIFT_DISK_BASE_DIR}/swift-disk${x}"
-   truncate -s "${SWIFT_DISK_SIZE_GB}GB" "${SWIFT_DISK}"
-   mkfs.xfs -f "${SWIFT_DISK}"
+# Create /srv directory structure
+for x in {1..4}; do
+   SWIFT_DISK_DIR="${SWIFT_DISK_BASE_DIR}/${x}"
+   SWIFT_CACHE_DIR="${SWIFT_CACHE_BASE_DIR}/swift${x}"
+
+   # necessary? used anywhere?
+   mkdir -p "${SWIFT_CACHE_DIR}"
 done
+
+#Create partitions on devices attached
+for device in vdc vdd vde vdf; do
+num=1
+sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | fdisk /dev/${device}
+  o # clear the in memory partition table
+  n # new partition
+  p # primary partition
+  1 # partition number 1
+  ${SWIFT_PARTITION_START_BLOCK}  # default - start at beginning of disk 
+  ${SWIFT_PARTITION_END_BLOCK} # default end block
+  p # print partition table
+  w # save and close
+  q
+EOF
+mkfs.xfs -L disk${num} -f /dev/${device}1
+mkdir -p ${SWIFT_MOUNT_BASE_DIR}/${device}1/${num}
+ln -s ${SWIFT_MOUNT_BASE_DIR}/${device}1/${num} ${SWIFT_DISK_BASE_DIR}/${num}
+mkdir -p ${SWIFT_CACHE_BASE_DIR}/swift${num}
+chown -R ${SWIFT_USER}:${SWIFT_GROUP} ${SWIFT_MOUNT_BASE_DIR}/${device}1
+num=$(expr ${num} + 1)
+done
+mv ${SWIFT_CACHE_BASE_DIR}/swift1 ${SWIFT_CACHE_BASE_DIR}/swift
 
 # good idea to have backup of fstab before we modify it
 cp /etc/fstab /etc/fstab.insert.bak
 
 #TODO check whether swift-disk entry already exists
 cat >> /etc/fstab << EOF
-/srv/swift-disk1 /srv/1/node/sdb1 xfs loop,noatime,nodiratime,nobarrier,logbufs=8 0 0
-/srv/swift-disk2 /srv/2/node/sdb2 xfs loop,noatime,nodiratime,nobarrier,logbufs=8 0 0
-/srv/swift-disk3 /srv/3/node/sdb3 xfs loop,noatime,nodiratime,nobarrier,logbufs=8 0 0
-/srv/swift-disk4 /srv/4/node/sdb4 xfs loop,noatime,nodiratime,nobarrier,logbufs=8 0 0
-/srv/swift-disk5 /srv/1/node/sdb5 xfs loop,noatime,nodiratime,nobarrier,logbufs=8 0 0
-/srv/swift-disk6 /srv/2/node/sdb6 xfs loop,noatime,nodiratime,nobarrier,logbufs=8 0 0
-/srv/swift-disk7 /srv/3/node/sdb7 xfs loop,noatime,nodiratime,nobarrier,logbufs=8 0 0
-/srv/swift-disk8 /srv/4/node/sdb8 xfs loop,noatime,nodiratime,nobarrier,logbufs=8 0 0
+LABEL=disk1 /mnt/vdc1 xfs noatime,nodiratime,nobarrier,logbufs=8 0 0
+LABEL=disk2 /mnt/vdd1 xfs noatime,nodiratime,nobarrier,logbufs=8 0 0
+LABEL=disk3 /mnt/vde1 xfs noatime,nodiratime,nobarrier,logbufs=8 0 0
+LABEL=disk4 /mnt/vdf1 xfs noatime,nodiratime,nobarrier,logbufs=8 0 0
 EOF
 
-for x in {1..4}; do
-   SWIFT_DISK_DIR="${SWIFT_DISK_BASE_DIR}/${x}"
-   SWIFT_MOUNT_DIR="${SWIFT_MOUNT_BASE_DIR}/${x}"
-   SWIFT_CACHE_DIR="${SWIFT_CACHE_BASE_DIR}/swift${x}"
-   mkdir -p ${SWIFT_MOUNT_DIR}
-   chown ${SWIFT_USER}:${SWIFT_GROUP} ${SWIFT_MOUNT_DIR}
-
-   # necessary? used anywhere?
-   mkdir -p "${SWIFT_CACHE_DIR}"
-
-   ln -s ${SWIFT_MOUNT_DIR} ${SWIFT_DISK_DIR}
-done
-mv ${SWIFT_CACHE_BASE_DIR}/swift1 ${SWIFT_CACHE_BASE_DIR}/swift
 
 mkdir -p ${SWIFT_DISK_BASE_DIR}/1/node/sdb1
 mkdir -p ${SWIFT_DISK_BASE_DIR}/2/node/sdb2
