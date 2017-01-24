@@ -86,8 +86,8 @@ done
 num=1
 for device in vdc1 vdd1 vde1 vdf1; do
     mkfs.xfs -f -L disk${num} /dev/${device}
-    mkdir -p ${SWIFT_MOUNT_BASE_DIR}/${device}/${num}
-    ln -s ${SWIFT_MOUNT_BASE_DIR}/${device}/${num} ${SWIFT_DISK_BASE_DIR}/${num}
+    mkdir -p "/mnt/${device}/${num}"
+    ln -s /mnt/${device}/${num} ${SWIFT_DISK_BASE_DIR}/${num}
     mkdir -p ${SWIFT_CACHE_BASE_DIR}/swift${num}
     chown -R ${SWIFT_USER}:${SWIFT_GROUP} ${SWIFT_MOUNT_BASE_DIR}/${device}
     num=$(expr ${num} + 1)
