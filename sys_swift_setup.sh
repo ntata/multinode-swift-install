@@ -84,15 +84,13 @@ done
 
 
 num=1
-for device in vdc vdd vde vdf; do
-    echo "num is ${num}"
-    mkfs.xfs -f -L disk${num} /dev/${device}1
-    mkdir -p ${SWIFT_MOUNT_BASE_DIR}/${device}1/${num}
-    ln -s ${SWIFT_MOUNT_BASE_DIR}/${device}1/${num} ${SWIFT_DISK_BASE_DIR}/${num}
+for device in vdc1 vdd1 vde1 vdf1; do
+    mkfs.xfs -f -L disk${num} /dev/${device}
+    mkdir -p ${SWIFT_MOUNT_BASE_DIR}/${device}/${num}
+    ln -s ${SWIFT_MOUNT_BASE_DIR}/${device}/${num} ${SWIFT_DISK_BASE_DIR}/${num}
     mkdir -p ${SWIFT_CACHE_BASE_DIR}/swift${num}
-    chown -R ${SWIFT_USER}:${SWIFT_GROUP} ${SWIFT_MOUNT_BASE_DIR}/${device}1
+    chown -R ${SWIFT_USER}:${SWIFT_GROUP} ${SWIFT_MOUNT_BASE_DIR}/${device}
     num=$(expr ${num} + 1)
-    echo "num after incr is ${num}"
 done
 mv ${SWIFT_CACHE_BASE_DIR}/swift1 ${SWIFT_CACHE_BASE_DIR}/swift
 
