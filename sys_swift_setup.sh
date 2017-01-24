@@ -165,6 +165,12 @@ echo "export PYTHONPATH=${SWIFT_USER_HOME}/swift" >> ${SWIFT_LOGIN_CONFIG}
 
 cp ${SWIFT_REPO_DIR}/test/sample.conf ${SWIFT_CONFIG_DIR}/test.conf
 
+#rsync configuration
+cp ${SWIFT_REPO_DIR}/doc/saio/rsyncd.conf /etc/
+sed -i "s/<your-user-name>/${SWIFT_USER}/" /etc/rsyncd.conf
+sed -i "s/RSYNC_ENABLE=false/RSYNC_ENABLE=true/" /etc/rsyncd.conf
+service rsync start
+
 cd ${SWIFT_REPO_DIR}/doc/saio/swift; cp -r * ${SWIFT_CONFIG_DIR}; cd -
 chown -R ${SWIFT_USER}:${SWIFT_GROUP} ${SWIFT_CONFIG_DIR}
 find ${SWIFT_CONFIG_DIR}/ -name \*.conf | xargs sed -i "s/<your-user-name>/${SWIFT_USER}/"
