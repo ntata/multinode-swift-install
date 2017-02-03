@@ -105,6 +105,7 @@ LABEL=disk3 /mnt/vde1 xfs noatime,nodiratime,nobarrier,logbufs=8 0 0
 LABEL=disk4 /mnt/vdf1 xfs noatime,nodiratime,nobarrier,logbufs=8 0 0
 EOF
 
+mount -a
 
 mkdir -p ${SWIFT_DISK_BASE_DIR}/1/node/sdb1
 mkdir -p ${SWIFT_DISK_BASE_DIR}/2/node/sdb2
@@ -118,7 +119,6 @@ mkdir -p ${SWIFT_DISK_BASE_DIR}/4/node/sdb8
 
 chown -R ${SWIFT_USER}:${SWIFT_GROUP} ${SWIFT_DISK_BASE_DIR}
 
-mount -a
 
 chown -R ${SWIFT_USER}:${SWIFT_GROUP} ${SWIFT_MOUNT_BASE_DIR}
 
