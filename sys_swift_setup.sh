@@ -83,17 +83,6 @@ EOF
 done
 
 
-num=1
-for device in vdc1 vdd1 vde1 vdf1; do
-    mkfs.xfs -f -L disk${num} /dev/${device}
-    mkdir -p "/mnt/${device}/${num}"
-    ln -s /mnt/${device}/${num} ${SWIFT_DISK_BASE_DIR}/${num}
-    mkdir -p ${SWIFT_CACHE_BASE_DIR}/swift${num}
-    chown -R ${SWIFT_USER}:${SWIFT_GROUP} ${SWIFT_MOUNT_BASE_DIR}/${device}
-    num=$(expr ${num} + 1)
-done
-mv ${SWIFT_CACHE_BASE_DIR}/swift1 ${SWIFT_CACHE_BASE_DIR}/swift
-
 # good idea to have backup of fstab before we modify it
 cp /etc/fstab /etc/fstab.insert.bak
 
@@ -106,6 +95,18 @@ LABEL=disk4 /mnt/vdf1 xfs noatime,nodiratime,nobarrier,logbufs=8 0 0
 EOF
 
 mount -a
+
+num=1
+for device in vdc1 vdd1 vde1 vdf1; do
+    mkfs.xfs -f -L disk${num} /dev/${device}
+    mkdir -p "/mnt/${device}/${num}"
+    ln -s /mnt/${device}/${num} ${SWIFT_DISK_BASE_DIR}/${num}
+    mkdir -p ${SWIFT_CACHE_BASE_DIR}/swift${num}
+    chown -R ${SWIFT_USER}:${SWIFT_GROUP} ${SWIFT_MOUNT_BASE_DIR}/${device}
+    num=$(expr ${num} + 1)
+done
+mv ${SWIFT_CACHE_BASE_DIR}/swift1 ${SWIFT_CACHE_BASE_DIR}/swift
+
 
 mkdir -p ${SWIFT_DISK_BASE_DIR}/1/node/sdb1
 mkdir -p ${SWIFT_DISK_BASE_DIR}/2/node/sdb2
